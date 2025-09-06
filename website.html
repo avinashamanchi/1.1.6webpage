@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Riddle Project 1.1.6</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    animation: {
+                        'bounce-slow': 'bounce 2s infinite',
+                        'pulse-slow': 'pulse 3s infinite',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f0f4f8 0%, #e0e7ef 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            transition: all 0.3s ease-in-out;
+        }
+
+        .btn-primary {
+            background-image: linear-gradient(to right, #6EE7B7 0%, #34D399 51%, #10B981 100%);
+            transition: 0.5s;
+            background-size: 200% auto;
+            color: white;
+            box-shadow: 0 4px 15px 0 rgba(49, 196, 190, 0.75);
+        }
+
+        .btn-primary:hover {
+            background-position: right center; 
+            transform: translateY(-2px);
+        }
+
+        .riddle-step {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+        }
+        
+        .progress-bar {
+            height: 6px;
+            background: linear-gradient(to right, #6EE7B7, #34D399);
+            width: 0%;
+            transition: width 1s ease-in-out;
+            border-radius: 3px;
+        }
+        
+        .floating {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        .number-bubble {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6EE7B7, #34D399);
+            color: white;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        
+        .magic-result {
+            position: relative;
+            display: inline-block;
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: transparent;
+            background-clip: text;
+            -webkit-background-clip: text;
+            background-image: linear-gradient(to right, #FF6B6B, #4ECDC4);
+            animation: pulse-slow 2s infinite;
+        }
+        
+        .concept-card {
+            transition: all 0.3s ease;
+            border-left: 4px solid #34D399;
+        }
+        
+        .concept-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .code-block {
+            font-family: 'Courier New', monospace;
+            background: #2D3748;
+            color: #E2E8F0;
+            border-radius: 8px;
+            padding: 16px;
+            overflow-x: auto;
+        }
+        
+        .code-comment { color: #A0AEC0; }
+        .code-keyword { color: #FF6B6B; }
+        .code-method { color: #4ECDC4; }
+        .code-variable { color: #FFD93D; }
+        .code-number { color: #6EE7B7; }
+        
+        .image-placeholder {
+            background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e0 100%);
+            border: 2px dashed #94a3b8;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #64748b;
+            font-weight: 500;
+            min-height: 200px;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8 flex justify-center items-start">
+
+    <div class="container max-w-5xl mx-auto bg-white rounded-3xl shadow-2xl p-6 md:p-10 my-6">
+
+        <header class="text-center mb-10">
+            <div class="floating inline-block mb-4">
+                <i class="fas fa-calculator text-5xl text-green-500"></i>
+            </div>
+            <h1 class="text-4xl md:text-5xl font-extrabold text-gray-800 mb-2 bg-gradient-to-r from-green-500 to-blue-600 bg-clip-text text-transparent">Math Riddle Project 1.1.6</h1>
+            <p class="text-lg md:text-xl text-gray-600">A magical mathematical exploration by Rishi and Avi</p>
+        </header>
+
+        <section class="mb-12 border-b pb-8 border-gray-200">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">
+                <i class="fas fa-wand-magic-sparkles text-yellow-500 mr-3"></i>
+                Interactive Riddle Calculator
+            </h2>
+            
+            <div class="mb-8 rounded-xl overflow-hidden shadow-lg">
+                <div class="image-placeholder">
+                    <img src="diagram.png" alt="Fun meme about the math riddle" class="w-full">
+                </div>
+            </div>
+            
+            <div class="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-4 mb-6">
+                <input type="number" id="inputNumber" placeholder="Enter any number..." class="w-full md:w-auto px-5 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-400 text-lg shadow-sm">
+                <button id="calculateBtn" class="btn-primary px-8 py-3 rounded-full text-lg font-semibold shadow-lg hover:shadow-xl transition-all flex items-center">
+                    <i class="fas fa-bolt mr-2"></i>
+                    Solve the Riddle
+                </button>
+            </div>
+            
+            <div class="progress-container w-full bg-gray-200 rounded-full h-2 mb-4 hidden">
+                <div class="progress-bar h-2 rounded-full"></div>
+            </div>
+            
+            <div id="riddleOutput" class="bg-gray-50 rounded-2xl p-6 md:p-8 mt-6 border border-gray-100 min-h-[250px] flex flex-col justify-center">
+                <p id="initialMessage" class="text-center text-gray-400 font-medium text-lg">
+                    <i class="fas fa-arrow-up mr-2"></i>
+                    Enter a number above to see the magic happen!
+                </p>
+            </div>
+        </section>
+
+        <section class="mb-12 border-b pb-8 border-gray-200">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">
+                <i class="fas fa-question-circle text-blue-500 mr-3"></i>
+                How the Riddle Works
+            </h2>
+            <p class="text-gray-700 text-lg leading-relaxed mb-6">
+                The riddle follows a simple algebraic sequence that <span class="font-bold text-purple-600">always results in the same number</span>, regardless of your starting number. Let's see the steps:
+            </p>
+            <ol class="list-none space-y-4 text-gray-700 text-lg px-4 md:px-0">
+                <li class="flex items-start">
+                    <span class="number-bubble">1</span>
+                    <p><span class="font-bold">Choose any number</span></p>
+                </li>
+                <li class="flex items-start">
+                    <span class="number-bubble">2</span>
+                    <p><span class="font-bold">Double it</span> (Multiply by 2)</p>
+                </li>
+                <li class="flex items-start">
+                    <span class="number-bubble">3</span>
+                    <p><span class="font-bold">Add 6</span></p>
+                </li>
+                <li class="flex items-start">
+                    <span class="number-bubble">4</span>
+                    <p><span class="font-bold">Divide it by 2</span></p>
+                </li>
+                <li class="flex items-start">
+                    <span class="number-bubble">5</span>
+                    <p><span class="font-bold">Subtract the number you started with</span></p>
+                </li>
+            </ol>
+            
+            <div class="bg-blue-50 p-6 rounded-2xl mt-8 mb-6">
+                <h3 class="text-xl font-bold text-blue-800 mb-3 flex items-center">
+                    <i class="fas fa-lightbulb text-yellow-500 mr-2"></i>
+                    Why does this always work?
+                </h3>
+                <p class="text-blue-700">
+                    Algebraically, if your starting number is <span class="font-mono font-bold">x</span>:
+                    <br>
+                    <span class="font-mono">((2x + 6) / 2) - x = (2x/2 + 6/2) - x = (x + 3) - x = 3</span>
+                </p>
+            </div>
+            
+            <p class="text-gray-700 text-lg leading-relaxed mt-6 text-center font-bold">
+                After these steps, you'll always end up with <span class="magic-result">3</span> no matter what number you started with!
+            </p>
+        </section>
+
+        <section class="mb-12 border-b pb-8 border-gray-200">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">
+                <i class="fas fa-code text-purple-500 mr-3"></i>
+                Programming Concepts
+            </h2>
+            <p class="text-gray-700 text-lg leading-relaxed text-center mb-6">This simple riddle project in Java demonstrates several fundamental programming concepts:</p>
+            
+            <div class="code-block mb-8">
+                <pre><code><span class="code-comment">// MathRiddle.java - Demonstrates basic programming concepts</span>
+<span class="code-keyword">public class</span> MathRiddle {
+    <span class="code-keyword">public static void</span> <span class="code-method">main</span>(String[] args) {
+        <span class="code-comment">// Step 1: Choose any number (variable declaration)</span>
+        <span class="code-keyword">int</span> <span class="code-variable">originalNumber</span> = <span class="code-number">5</span>;
+        
+        <span class="code-comment">// Step 2: Double it (arithmetic operation)</span>
+        <span class="code-keyword">int</span> <span class="code-variable">doubledNumber</span> = <span class="code-variable">originalNumber</span> * <span class="code-number">2</span>;
+        
+        <span class="code-comment">// Step 3: Add 6 (compound assignment)</span>
+        <span class="code-variable">doubledNumber</span> += <span class="code-number">6</span>;
+        
+        <span class="code-comment">// Step 4: Divide by 2 (type conversion)</span>
+        <span class="code-keyword">double</span> <span class="code-variable">halfNumber</span> = <span class="code-variable">doubledNumber</span> / <span class="code-number">2.0</span>;
+        
+        <span class="code-comment">// Step 5: Subtract original number</span>
+        <span class="code-keyword">double</span> <span class="code-variable">result</span> = <span class="code-variable">halfNumber</span> - <span class="code-variable">originalNumber</span>;
+        
+        <span class="code-comment">// Output the result</span>
+        System.<span class="code-variable">out</span>.<span class="code-method">println</span>(<span class="code-variable">result</span>); <span class="code-comment">// Always 3.0!</span>
+    }
+}</code></pre>
+            </div>
+            
+            <!-- Image placeholder 2: Code output -->
+            <div class="mb-8 rounded-xl overflow-hidden shadow-lg">
+                <div class="image-placeholder">
+                    <img src="output.png" alt="Program output showing the result" class="w-minimum">
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="concept-card bg-gray-50 p-5 rounded-xl">
+                    <div class="flex items-center mb-3">
+                        <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+                            <i class="fas fa-font text-blue-500"></i>
+                        </div>
+                        <h3 class="font-bold text-lg">CamelCase Naming</h3>
+                    </div>
+                    <p class="text-gray-700">Variable names like <code>originalNumber</code> use camelCase convention</p>
+                </div>
+                
+                <div class="concept-card bg-gray-50 p-5 rounded-xl">
+                    <div class="flex items-center mb-3">
+                        <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center mr-3">
+                            <i class="fas fa-comment text-green-500"></i>
+                        </div>
+                        <h3 class="font-bold text-lg">Comments</h3>
+                    </div>
+                    <p class="text-gray-700">Both multiline and inline comments for documentation</p>
+                </div>
+                
+                <div class="concept-card bg-gray-50 p-5 rounded-xl">
+                    <div class="flex items-center mb-3">
+                        <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center mr-3">
+                            <i class="fas fa-print text-purple-500"></i>
+                        </div>
+                        <h3 class="font-bold text-lg">Print Methods</h3>
+                    </div>
+                    <p class="text-gray-700">Using <code>System.out.println()</code> for output</p>
+                </div>
+                
+                <div class="concept-card bg-gray-50 p-5 rounded-xl">
+                    <div class="flex items-center mb-3">
+                        <div class="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center mr-3">
+                            <i class="fas fa-cube text-yellow-500"></i>
+                        </div>
+                        <h3 class="font-bold text-lg">Variables</h3>
+                    </div>
+                    <p class="text-gray-700">Storing and manipulating data with variables</p>
+                </div>
+                
+                <div class="concept-card bg-gray-50 p-5 rounded-xl">
+                    <div class="flex items-center mb-3">
+                        <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center mr-3">
+                            <i class="fas fa-calculator text-red-500"></i>
+                        </div>
+                        <h3 class="font-bold text-lg">Arithmetic Expressions</h3>
+                    </div>
+                    <p class="text-gray-700">Mathematical operations like +, -, *, /</p>
+                </div>
+                
+                <div class="concept-card bg-gray-50 p-5 rounded-xl">
+                    <div class="flex items-center mb-3">
+                        <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center mr-3">
+                            <i class="fas fa-equals text-indigo-500"></i>
+                        </div>
+                        <h3 class="font-bold text-lg">Compound Assignment</h3>
+                    </div>
+                    <p class="text-gray-700">Using operators like <code>+=</code> for concise code</p>
+                </div>
+                
+                <div class="concept-card bg-gray-50 p-5 rounded-xl">
+                    <div class="flex items-center mb-3">
+                        <div class="w-10 h-10 rounded-full bg-pink-100 flex items-center justify-center mr-3">
+                            <i class="fas fa-exchange-alt text-pink-500"></i>
+                        </div>
+                        <h3 class="font-bold text-lg">Type Conversion</h3>
+                    </div>
+                    <p class="text-gray-700">Converting between <code>int</code> and <code>double</code> data types</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-12">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">
+                <i class="fas fa-play-circle text-red-500 mr-3"></i>
+                Example Run
+            </h2>
+            <p class="text-gray-700 text-lg leading-relaxed text-center mb-6">
+                Here's an example of the program running with a specific number:
+            </p>
+            
+            <!-- Image placeholder 3: Specific number case output -->
+            <div class="mb-8 rounded-xl overflow-hidden shadow-lg">
+                <div class="image-placeholder">
+                    <img src="output1.png" alt="Program output with a specific input number" class="w-half">
+                </div>
+            </div>
+            
+            <div class="bg-gray-50 p-6 rounded-2xl">
+                <h3 class="text-xl font-bold text-gray-800 mb-4">Try it yourself with different numbers!</h3>
+                <p class="text-gray-700 mb-4">
+                    The interactive calculator at the top of the page lets you experiment with any number you choose.
+                    No matter what number you pick, the result will always be 3!
+                </p>
+                <div class="flex justify-center">
+                    <button id="tryAnotherBtn" class="btn-primary px-6 py-2 rounded-full text-md font-semibold shadow-lg hover:shadow-xl transition-all flex items-center">
+                        <i class="fas fa-redo-alt mr-2"></i>
+                        Try Another Number
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <footer class="text-center text-gray-500 pt-6">
+            <p>Created by Rishi and Avi • Math Riddle Project 1.1.6</p>
+        </footer>
+
+    </div>
+
+    <script>
+        document.getElementById('calculateBtn').addEventListener('click', () => {
+            const inputElement = document.getElementById('inputNumber');
+            const outputElement = document.getElementById('riddleOutput');
+            const progressContainer = document.querySelector('.progress-container');
+            const progressBar = document.querySelector('.progress-bar');
+            const initialNumber = parseFloat(inputElement.value);
+
+            if (isNaN(initialNumber)) {
+                outputElement.innerHTML = `<p class="text-center text-red-500 font-bold text-lg flex items-center justify-center">
+                    <i class="fas fa-exclamation-circle mr-2"></i> Please enter a valid number.
+                </p>`;
+                return;
+            }
+
+            // Clear previous output and show progress bar
+            outputElement.innerHTML = '';
+            progressContainer.classList.remove('hidden');
+            
+            // Reset and animate progress bar
+            progressBar.style.width = '0%';
+            setTimeout(() => {
+                progressBar.style.width = '100%';
+            }, 50);
+
+            const initialMessage = document.getElementById('initialMessage');
+            if (initialMessage) {
+                initialMessage.style.display = 'none';
+            }
+
+            let currentNumber = initialNumber;
+            let steps = [];
+
+            steps.push({
+                text: `<span class="font-bold text-gray-800"><span class="number-bubble">1</span> Choose an integer:</span> ${initialNumber}`,
+                value: initialNumber
+            });
+
+            const step2Result = currentNumber * 2;
+            steps.push({
+                text: `<span class="font-bold text-gray-800"><span class="number-bubble">2</span> Double it:</span> ${currentNumber} × 2 = ${step2Result}`,
+                value: step2Result
+            });
+            currentNumber = step2Result;
+
+            const step3Result = currentNumber + 6;
+            steps.push({
+                text: `<span class="font-bold text-gray-800"><span class="number-bubble">3</span> Add 6:</span> ${currentNumber} + 6 = ${step3Result}`,
+                value: step3Result
+            });
+            currentNumber = step3Result;
+
+            const step4Result = currentNumber / 2;
+            steps.push({
+                text: `<span class="font-bold text-gray-800"><span class="number-bubble">4</span> Divide by 2:</span> ${currentNumber} ÷ 2 = ${step4Result.toFixed(2)}`,
+                value: step4Result
+            });
+            currentNumber = step4Result;
+
+            const step5Result = currentNumber - initialNumber;
+            steps.push({
+                text: `<span class="font-bold text-gray-800"><span class="number-bubble">5</span> Subtract original number:</span> ${currentNumber.toFixed(2)} - ${initialNumber} = ${step5Result.toFixed(2)}`,
+                value: step5Result
+            });
+
+            // Animate the steps
+            steps.forEach((step, index) => {
+                setTimeout(() => {
+                    const stepEl = document.createElement('div');
+                    stepEl.classList.add('riddle-step', 'text-gray-700', 'text-lg', 'leading-relaxed', 'mb-3', 'p-3', 'bg-white', 'rounded-lg', 'shadow-sm');
+                    stepEl.innerHTML = step.text;
+
+                    if (index === steps.length - 1) {
+                        stepEl.classList.add('bg-green-50', 'border', 'border-green-200', 'mt-4');
+                        stepEl.innerHTML = `
+                            <div class="flex items-center">
+                                <i class="fas fa-check-circle text-green-500 text-2xl mr-3"></i>
+                                <div>
+                                    <span class="font-bold text-gray-800">Final Result:</span> 
+                                    <span class="text-3xl font-extrabold magic-result">${step.value.toFixed(2)}</span>
+                                </div>
+                            </div>
+                        `;
+                    }
+                    
+                    outputElement.appendChild(stepEl);
+                    setTimeout(() => {
+                        stepEl.style.opacity = '1';
+                        stepEl.style.transform = 'translateY(0)';
+                    }, 50);
+                }, index * 1000);
+            });
+
+            // Hide progress bar after animation
+            setTimeout(() => {
+                progressContainer.classList.add('hidden');
+            }, steps.length * 1000);
+        });
+
+        // Add functionality to the "Try Another Number" button
+        document.getElementById('tryAnotherBtn').addEventListener('click', () => {
+            document.getElementById('inputNumber').value = '';
+            document.getElementById('inputNumber').focus();
+        });
+    </script>
+</body>
+</html>
